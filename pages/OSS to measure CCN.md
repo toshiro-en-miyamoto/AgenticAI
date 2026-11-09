@@ -1,0 +1,21 @@
+id:: 6af02727-d3cf-4605-abf4-f52dd544d69e
+
+- ## Overview
+  - Google Gemini: "open-source static analyzer to measure cyclomatic complexity"
+- ## Multi-Language Standalone Tools
+  - [Lizard](https://github.com/terryyin/lizard): A lightweight, highly extensible tool that calculates the Cyclomatic Complexity Number (CCN) without needing header files or imports.
+    - **Languages**: Supports over 25 languages including C/C++, Java, Python, JavaScript, Rust, Swift, and Go.
+    - **Best for**: Quick CLI execution, pre-commit hooks, or simple integration into custom scripts.
+  - [SonarQube Community Build](https://www.sonarsource.com/open-source-editions/sonarqube-community-edition/): Licensed under LGPL-3.0, this is the open-source tier of the industry-standard code quality platform.
+    - **Languages**: Measures complexity and quality gates across 21 languages out-of-the-box.
+    - **Best for**: Continuous Integration (CI/CD) pipelines requiring visual dashboards and trend history over time.
+  - [PMD](https://docs.pmd-code.org/latest/index.html)
+    - **Languages**: Java, JavaScript, Kotlin, Swift, PL/SQL, JSP, WSDL, Maven POM, HTML, XML and XSL.
+    - **Best for**: A quality gate integrated into your build process, such as Maven goal.
+- ## Language-Specific Open-Source Analyzers
+  - [Radon](https://github.com/rubik/radon)
+    - Python
+    - Computes cyclomatic complexity, maintainability index, and raw metrics.
+  - [ESLint](https://eslint.org/)
+    - JavaScript, TypeScript
+    - Features a built-in complexity rule to enforce a maximum cyclomatic complexity threshold during linting.
