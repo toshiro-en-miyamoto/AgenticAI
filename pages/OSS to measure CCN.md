@@ -19,3 +19,6 @@ id:: 6af02727-d3cf-4605-abf4-f52dd544d69e
   - [ESLint](https://eslint.org/)
     - JavaScript, TypeScript
     - Features a built-in complexity rule to enforce a maximum cyclomatic complexity threshold during linting.
+  - [JaCoCo - Java Code Coverage Library](https://www.jacoco.org/jacoco/trunk/index.html)
+    - Java
+    - Calculates calculates cyclomatic complexity for each non-abstract method and summarizes complexity for classes, packages and groups. It also calculate code coverage (C0 and C1) of Java byte code.
