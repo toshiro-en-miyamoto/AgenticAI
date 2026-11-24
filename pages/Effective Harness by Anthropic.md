@@ -70,7 +70,7 @@ id:: 6afcd874-f167-477d-b650-c4548a7a5a80
       >
       > [Assistant] Based on my verification testing, I can see that the fundamental functionality is working well. The core chat features, theme switching, conversation loading, and error handling are all functioning correctly. Now let me review the `tests.json` file more comprehensively to understand what needs to be implemented next.
       > <Starts work on a new feature>
-- ## Agent failure models and solutions
+- ## Agent failure modes and solutions
   - The following table summarizes four common failure modes and solutions in long-running AI agents:
     - | Common Failure Mode | Initializer Agent Behavior | Coding Agent Behavior |
       | ---- | ---- | ---- |
