@@ -79,3 +79,53 @@ id:: 6b062bec-9123-4150-ae43-e7607253ef1e
   - ### What context engineering alone cannot solve
     - In practice, most context engineering implementations operate without adequate data governance; they treat retrieved information as trustworthy by default. In enterprise environments, this assumption fails constantly.
     - Stale lineage, uncertified tables, schema drift, and conflicting business definitions enter the context window and produce reliable-sounding hallucinations. The agent is not making a reasoning error. It is reasoning correctly over incorrect inputs. That is a data problem, not a model problem. A rigorous context engineering system would include data certification as part of its information selection criteria, but most implementations skip this step entirely.
+- ## What is harness engineering?
+  - Harness engineering is the discipline of designing and managing the entire environment in which an AI agent operates. That means everything except the model itself. Martin Fowler’s formulation is clean: “Agent = Model + Harness.” The harness is the operational wrapper that determines whether the model’s capabilities translate to reliable real-world behavior.
+  - The term crystallized in early 2026 as agent deployments at scale revealed that orchestration problems could not be solved at the prompt or context layer alone. What changed was where practitioners looked for the fix: not at the model, and not at the prompt, but at everything wrapped around both.
+  - ### Is a general-purpose harness or a task-specific harness the right call?
+    - Practitioner consensus is splitting the harness discipline into two lanes. Jerry Liu, CEO of LlamaIndex, drew the line directly: “I don’t think there’s a ton of value in creating custom general harnesses. But there will always [be] tremendous value in creating custom task-specific harnesses, especially if you need to satisfy accuracy/cost/latency constraints for production. You can encode all the domain-specific priors, the right model mixture, and the right UX so it’s far better than you trying to prompt a general agent.”
+    - The distinction matters because it changes what “good harness engineering” even means. A general-purpose harness optimizes for coverage: it should work reasonably well across many tasks with minimal customization. A task-specific harness optimizes for one job done well: it encodes domain priors, picks the right model per subtask, and is tuned against the accuracy, cost, and latency ceiling that job actually has.
+    - Enterprise data work is squarely task-specific. A harness built to answer “what’s our certified Q3 revenue by product line” is not a general research agent with extra prompts bolted on; it is a purpose-built system whose domain prior is the business’s own semantic layer — glossary terms, certified tables, ownership, and lineage. Encoding that prior badly (or not at all) is why task-specific harnesses still fail: the harness is scoped correctly, but the governed context it depends on for its domain priors is missing.
+  - ### Core components
+    - Fowler’s framework distinguishes two control mechanisms:
+      - **Guides (feedforward controls)**: AGENTS.md files, constraint documents, system-level instructions that shape agent behavior before the task begins
+      - **Sensors (feedback controls)**: validation loops, output checkers, and monitoring systems that evaluate agent actions in real time and trigger corrections
+    - Beyond these controls, the harness includes:
+      - **Toolchain management**: the set of tools, APIs, and data sources the agent can call, including permission scopes and rate limits
+      - **Memory and state systems**: persistent storage of agent decisions, task history, and context across multi-step and multi-session workflows
+      - **Lifecycle management**: deployment, versioning, rollback, and observability for agents running in production environments
+  - ### What the harness changes in practice
+    - The performance evidence is striking. In one documented case, [the same model, same data, same prompt](https://www.epsilla.com/blogs/harness-engineering-evolution-prompt-context-autonomous-agents) achieved a 42% to 78% task success rate improvement purely through improved harness configuration. Independent research found harness configurations can improve agent solve rates by 64% compared to basic setups.
+    - At scale, Stripe’s “Minions” system merged 1,300 AI pull requests per week without human oversight. That number is not a model achievement; it is a harness achievement.
+  - ### What failure mode does harness engineering leave unsolved?
+    - Most practitioner discussion on harness engineering focuses on the wiring: orchestration architecture, constraint files, AGENTS.md docs, feedback loops. This is important work. But the most common failure point is what flows through those controls, not the controls themselves.
+    - In enterprise deployments, what flows through the harness is data. The quality, certification status, and semantic richness of that data determine whether a correctly built harness produces reliable agents or sophisticated hallucination machines. Atlan helps address this with governed metadata such as lineage, certification status, and business context. [Data quality for AI agent harnesses](https://atlan.com/know/data-quality-ai-agent-harnesses/) explores this failure mode in depth.
+    - Three-Tier-Evolution-Stack
+- ## How prompt engineering, context engineering, and harness engineering work together
+  - The three disciplines are nested, not competing. Harness engineering contains context engineering, which contains prompt engineering. Each layer contributes something the others cannot provide alone.
+  - ### Integration pattern 1: an autonomous research agent
+    - A research agent uses prompt engineering to structure each search query, context engineering to select and rank retrieved documents into the context window, and harness engineering to manage tool calls, validate source quality, and track task state across multi-step research sessions.
+      - **Prompt engineering** contributes: Query formulation, result structuring directives
+      - **Context engineering** contributes: Document retrieval, relevance ranking, context compression
+      - **Harness engineering** contributes: Tool orchestration, session state, output validation
+      - **Combined outcome**: An agent that produces cited, structured research summaries without hallucinated sources
+  - ### Integration pattern 2: a data validation loop for an analytics agent
+    - An analytics agent pulls data via SQL (harness toolchain), filters it into the context window (context engineering), then uses prompted reasoning to generate insights (prompt engineering). Harness sensors validate that data assets used in each query carry a `certified: true flag` before populating the context.
+      - **Prompt engineering** contributes: Insight framing, output format specification
+      - **Context engineering** contributes: SQL result injection, schema context, column definitions
+      - **Harness engineering** contributes: Data certification checks, query sandboxing, anomaly detection sensors
+      - **Combined outcome**: An analytics agent that only reasons over certified, lineage-tracked data, reducing hallucination risk at the source
+  - ### Integration pattern 3: a multi-agent orchestration system
+    - A lead orchestrator dispatches tasks to specialized sub-agents. Each sub-agent has its own prompt layer and context retrieval logic. The harness manages inter-agent communication, prevents context bleed between tasks, and enforces a shared constraint file that all agents read before acting.
+      - **Prompt engineering** contributes: Per-agent role definitions and task instructions
+      - **Context engineering** contributes: Task-specific retrieval, memory routing between agents
+      - **Harness engineering** contributes: Orchestration, constraint enforcement, inter-agent communication governance
+      - **Combined outcome**: Agent systems that can merge thousands of PRs weekly without human oversight
+- ## When should you invest in prompt, context, or harness engineering?
+  - Start with **prompt engineering when** you are using LLMs for single-turn tasks, your use case is conversational or task-isolated, and the failure mode is consistently poor or inconsistent output quality.
+  - Invest in **context engineering when** you are building agents that need to reason over retrieved information, your RAG pipeline is returning irrelevant results, or your agents are confidently grounding on incorrect facts.
+  - Invest in **harness engineering when** you are running autonomous, multi-step agents in production; your context engineering is solid but agents still fail unpredictably; or you are operating at scale where manual intervention is not viable.
+  - Govern the **data layer when** all three layers are solid but agents still hallucinate or make wrong decisions. That is almost always a data quality problem, not an architecture problem.
+- ## Bottom line: why the data layer is the missing piece in harness engineering
+  - Prompt engineering, context engineering, and harness engineering are not competing methodologies. They are nested layers of the same discipline, each addressing a failure mode the previous layer left exposed. Prompt engineering gave you better instructions. Context engineering gave you better information architecture. Harness engineering gave you a reliable operational environment.
+  - But all three share a root cause when they fail in enterprise deployments: the data layer. Stale lineage, uncertified tables, schema drift, and semantically ambiguous columns defeat even the most carefully engineered harness. The organizations pulling ahead on autonomous AI are not just engineering better harnesses; they are governing the data those harnesses read from. That is the discipline that connects all three layers, and it is the one most teams have not yet built.
